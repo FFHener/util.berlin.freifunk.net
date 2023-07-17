@@ -12,7 +12,7 @@ if (file_exists($cachefile)) {
     }
 }
 
-if (!isset($locations)){
+if (!isset($locations)) {
     // Otherwise scrape the information from the freifunk wiki, getting all info about the berlin nodes
     $index = file_get_contents('https://wiki.freifunk.net/Kategorie:Standorte_Berlin');
     preg_match_all(
@@ -30,9 +30,9 @@ if (!isset($locations)){
     $index = file_get_contents($url);
     $index = json_decode($index, true);
     $standorte = $index['query']['results'];
-//	echo "<pre>";
-//	print_r ($standorte);
-//	exit();
+//  echo "<pre>";
+//  print_r ($standorte);
+//  exit();
 
     foreach ($standorte as $standort => $item) {
         unset($location);
@@ -52,21 +52,21 @@ if (!isset($locations)){
     }
 
     // And write the array to the cache file
-    file_put_contents( $cachefile, serialize($locations) );
+    file_put_contents($cachefile, serialize($locations));
 }
 
 // Parse the variables Google Earth passes with each refresh as instructed by the first KML file.
 list ($cameraLon, $cameraLat, $cameraAlt) = explode(",", $_GET['VARS']);
 
 // Create links if the eye altitude is below 250 meters
-if (isset ($cameraAlt) && $cameraAlt < 250) {
+if (isset($cameraAlt) && $cameraAlt < 250) {
     $survey_location['lat'] = $cameraLat;
     $survey_location['lon'] = $cameraLon;
     $survey_location['alt'] = $cameraAlt - 6;
     $survey_location['name'] = "Survey Location";
 
     foreach ($locations as $location) {
-        if ( $location['alt'] > 0 ) {
+        if ($location['alt'] > 0) {
             unset($link);
             $link['name'] = $location['name'];
             $link['lat'] = $location['lat'];
@@ -76,8 +76,8 @@ if (isset ($cameraAlt) && $cameraAlt < 250) {
             $link['azimuth to'] = bearing($survey_location, $link) . "&deg;";
             $link['elevation to'] = elevation($survey_location, $link) . "&deg;";
             $link['azimuth from'] = bearing($link, $survey_location) . "&deg;";
-            $link['fspl_2.4'] = fspl( $link['distance'], 2400000000);
-            $link['fspl_5'] = fspl( $link['distance'], 5000000000);
+            $link['fspl_2.4'] = fspl($link['distance'], 2400000000);
+            $link['fspl_5'] = fspl($link['distance'], 5000000000);
             $links[] = $link;
         }
     }
@@ -101,7 +101,7 @@ $kml .= '<Folder>';
 $kml .= '<name>Locations</name>';
 $kml .= '<Style><ListStyle><listItemType>checkHideChildren</listItemType><ItemIcon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></ItemIcon></ListStyle></Style>';
 foreach ($locations as $location) {
-    if ($location['lat'] > 0){
+    if ($location['lat'] > 0) {
         $kml .= '<Placemark>';
         $kml .= '<name>' . $location['name'] . '</name>';
         $kml .= '<description><![CDATA[' . balloonCSS();
@@ -157,7 +157,7 @@ if (isset($links)) {
         $kml .= '</table>]]></description>';
         $kml .= '<styleUrl>#polygon-transparent</styleUrl>';
         $kml .= '<MultiGeometry>' . "\n\n";
-        $kml .= makeFresnelPolygons( $survey_location, $link, 2400000000, 20);
+        $kml .= makeFresnelPolygons($survey_location, $link, 2400000000, 20);
         $kml .= '</MultiGeometry>' . "\n\n";
         $kml .= '</Placemark>';
 
@@ -165,14 +165,13 @@ if (isset($links)) {
         $kml .= '<name>5 GHz fresnel zone</name>';
         $kml .= '<styleUrl>#polygon</styleUrl>';
         $kml .= '<MultiGeometry>' . "\n\n";
-        $kml .= makeFresnelPolygons( $survey_location, $link, 5000000000,20);
+        $kml .= makeFresnelPolygons($survey_location, $link, 5000000000,20);
         $kml .= '</MultiGeometry>' . "\n\n";
         $kml .= '</Placemark>';
 
         $kml .= '</Folder>' . "\n\n";
     }
     $kml .= '</Folder>';
-
 }
 
 $kml .= '</Document></kml>' . "\n";
@@ -181,9 +180,10 @@ echo $kml;
 
 
 // The arguments to distance, bearing and elevation functions are arrays that expected to have keys
-// named 'lat', 'lon' and (except for bearing) 'alt'. 
+// named 'lat', 'lon' and (except for bearing) 'alt'.
 
-function distance($from, $to) {
+function distance($from, $to) 
+{
 
     $lat1 = deg2rad($from['lat']);
     $lon1 = deg2rad($from['lon']);
@@ -191,18 +191,18 @@ function distance($from, $to) {
     $lon2 = deg2rad($to['lon']);
 
     $theta = $lon1 - $lon2;
-    $dist = rad2deg( acos(     sin($lat1) * sin($lat2)  +  cos($lat1) * cos($lat2) * cos($theta)     ) )  *  ( CIRCUMFERENCE_OF_EARTH / 360 );
+    $dist = rad2deg(acos(sin($lat1) * sin($lat2)  +  cos($lat1) * cos($lat2) * cos($theta)))  *  ( CIRCUMFERENCE_OF_EARTH / 360 );
 
     // Add the diagonal component using pythagoras
     // (even if diff minimal in most of our cases)
     $alt_diff = abs($from['alt'] - $to['alt']);
-    $dist = sqrt( ($alt_diff * $alt_diff) + ($dist * $dist) );
+    $dist = sqrt(($alt_diff * $alt_diff) + ($dist * $dist));
 
-    return intval ($dist);
-
+    return intval($dist);
 }
 
-function bearing($from, $to) {
+function bearing($from, $to)
+{
 
     $lat1 = deg2rad($from['lat']);
     $lon1 = deg2rad($from['lon']);
@@ -214,10 +214,10 @@ function bearing($from, $to) {
 
     //difference in the phi of latitudinal coordinates
     $dPhi = log(tan($lat2 / 2 + M_PI / 4) / tan($lat1 / 2 + M_PI / 4));
- 
+
     //we need to recalculate $dLon if it is greater than pi
-    if( abs($dLon) > M_PI ) {
-        if($dLon > 0) {
+    if (abs($dLon) > M_PI) {
+        if ($dLon > 0) {
             $dLon = (2 * M_PI - $dLon) * -1;
         } else {
             $dLon = 2 * M_PI + $dLon;
@@ -228,20 +228,18 @@ function bearing($from, $to) {
     return ( rad2deg(atan2($dLon, $dPhi)) + 360 ) % 360;
 }
 
-function elevation($from, $to) {
-    
+function elevation($from, $to)
+{
     return intval(rad2deg(atan2( $to['alt'] - $from['alt'], distance($from, $to) )));
-
 }
 
-function fspl($dist, $freq) {
-
+function fspl($dist, $freq)
+{
     return intval(20 * log10(((4 * M_PI) / SPEED_OF_LIGHT) * $dist * $freq));
-
 }
 
-function makeFresnelPolygons($from, $to, $freq, $steps_in_circles) {
-
+function makeFresnelPolygons($from, $to, $freq, $steps_in_circles)
+{
     // How many degrees is a meter?
     $lat_meter = 1 / ( CIRCUMFERENCE_OF_EARTH / 360 );
     $lon_meter = (1 / cos(deg2rad($from['lat']))) * $lat_meter;
@@ -270,14 +268,13 @@ function makeFresnelPolygons($from, $to, $freq, $steps_in_circles) {
     foreach ($temp as $step) {
         $steps_in_path[] = 1 - $step;
     }
-    
+
     // Sort and remove duplicates
     sort($steps_in_path, SORT_NUMERIC);
     $steps_in_path = array_unique($steps_in_path);
 
     // Fill array $rings with arrays that each hold a ring of points surrounding the beam
     foreach ($steps_in_path as $step) {
-
         $centerpoint['lat'] = $from['lat'] + ( ($to['lat'] - $from['lat']) * $step );
         $centerpoint['lon'] = $from['lon'] + ( ($to['lon'] - $from['lon']) * $step );
         $centerpoint['alt'] = $from['alt'] + ( ($to['alt'] - $from['alt']) * $step );
@@ -285,14 +282,13 @@ function makeFresnelPolygons($from, $to, $freq, $steps_in_circles) {
         // Fresnel radius calculation
         $d1 = $distance * $step;
         $d2 = $distance - $d1;
-        $radius = sqrt( ($wavelen * $d1 * $d2) / $distance );
+        $radius = sqrt(($wavelen * $d1 * $d2) / $distance);
 
         // Bearing of line perpendicular to bearing of line of sight.
         $ring_bearing = $bearing + 90 % 360;
 
-        unset ($ring);
-        for ($n=0; $n<$steps_in_circles; $n++) {
-
+        unset($ring);
+        for ($n = 0; $n < $steps_in_circles; $n++) {
             $angle = $n * ( 360 / $steps_in_circles );
             $vertical_factor = cos(deg2rad($angle));
             $horizontal_factor = sin(deg2rad($angle));
@@ -306,14 +302,12 @@ function makeFresnelPolygons($from, $to, $freq, $steps_in_circles) {
             $ring[] = $new_point;
         }
         $rings[] = $ring;
-
     }
 
     // Make the polygons
 
     // since polygons connect this ring with next, skip last one.
     for ($ring_nr = 0; $ring_nr < count($rings) - 1; $ring_nr++) {
-
         $next_ring_nr = $ring_nr + 1;
 
         for ($point_nr = 0; $point_nr < $steps_in_circles; $point_nr++) {
@@ -323,15 +317,13 @@ function makeFresnelPolygons($from, $to, $freq, $steps_in_circles) {
                 $next_point_nr = 0;
             }
 
-            unset ($polygon);
+            unset($polygon);
             $polygon[] = $rings[$ring_nr][$point_nr];
             $polygon[] = $rings[$next_ring_nr][$point_nr];
             $polygon[] = $rings[$next_ring_nr][$next_point_nr];
             $polygon[] = $rings[$ring_nr][$next_point_nr];
 
             $polygons[] = $polygon;
-
-
         }		
     }
 
@@ -343,7 +335,7 @@ function makeFresnelPolygons($from, $to, $freq, $steps_in_circles) {
         foreach ($polygon as $point) {
             $ret .= $point['lon'] . ',' . $point['lat'] . ',' . $point['alt'] . " ";
         }
-    
+
         $ret .= '</coordinates></LinearRing></outerBoundaryIs></Polygon>';
     }
 
