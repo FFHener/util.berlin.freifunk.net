@@ -165,7 +165,7 @@ if (isset($links)) {
         $kml .= '<name>5 GHz fresnel zone</name>';
         $kml .= '<styleUrl>#polygon</styleUrl>';
         $kml .= '<MultiGeometry>' . "\n\n";
-        $kml .= makeFresnelPolygons($survey_location, $link, 5000000000,20);
+        $kml .= makeFresnelPolygons($survey_location, $link, 5000000000, 20);
         $kml .= '</MultiGeometry>' . "\n\n";
         $kml .= '</Placemark>';
 
@@ -454,5 +454,3 @@ HEREDOC;
 
     return $css;
 }
-
-?>
