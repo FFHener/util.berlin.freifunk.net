@@ -182,7 +182,7 @@ echo $kml;
 // The arguments to distance, bearing and elevation functions are arrays that expected to have keys
 // named 'lat', 'lon' and (except for bearing) 'alt'.
 
-function distance($from, $to) 
+function distance($from, $to)
 {
 
     $lat1 = deg2rad($from['lat']);
@@ -230,7 +230,7 @@ function bearing($from, $to)
 
 function elevation($from, $to)
 {
-    return intval(rad2deg(atan2( $to['alt'] - $from['alt'], distance($from, $to) )));
+    return intval(rad2deg(atan2($to['alt'] - $from['alt'], distance($from, $to))));
 }
 
 function fspl($dist, $freq)
@@ -311,7 +311,6 @@ function makeFresnelPolygons($from, $to, $freq, $steps_in_circles)
         $next_ring_nr = $ring_nr + 1;
 
         for ($point_nr = 0; $point_nr < $steps_in_circles; $point_nr++) {
-
             $next_point_nr = $point_nr + 1;
             if ($point_nr == $steps_in_circles - 1) {
                 $next_point_nr = 0;
@@ -324,7 +323,7 @@ function makeFresnelPolygons($from, $to, $freq, $steps_in_circles)
             $polygon[] = $rings[$ring_nr][$next_point_nr];
 
             $polygons[] = $polygon;
-        }		
+        }
     }
 
     $ret = '';
@@ -340,12 +339,12 @@ function makeFresnelPolygons($from, $to, $freq, $steps_in_circles)
     }
 
     return $ret;
-
 }
 
 
 
-function headerKML() {
+function headerKML()
+{
 
     $kml = <<<HEREDOC
 <?xml version="1.0" encoding="UTF-8"?>
@@ -441,7 +440,8 @@ HEREDOC;
     return $kml;
 }
 
-function balloonCSS() {
+function balloonCSS()
+{
 
     // There is no global stylesheet in Google Earth, so this needs to be appended to each balloon to make it display nicely.
     $css = <<<HEREDOC
@@ -451,7 +451,7 @@ function balloonCSS() {
     td, h2 {white-space: nowrap; font-family: verdana;}
 </style>
 HEREDOC;
-    
+
     return $css;
 }
 
